@@ -4,7 +4,7 @@
 #include <FastLED.h>
 #define NUM_LEDS 60
 #define DATA_PIN 9
-#define BAUD 9600
+#define BAUD 19200
 
 CRGBArray<NUM_LEDS> leds;
 
