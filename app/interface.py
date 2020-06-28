@@ -8,70 +8,79 @@ PORT = 'COM3'
 BAUD = 9600
 
 
-def connect(PORT=PORT, BAUD=BAUD, verbose=False):
-    global s
+class Arduino:
+    def connect(self, port=PORT, baud=BAUD, verbose=False):
+        if verbose:
+            print(f"Connecting to '{PORT}' at {baud} baud...")
 
-    if verbose:
-        print(f"Connecting to '{PORT}' at {BAUD} baud")
-    s = Serial(PORT, BAUD, timeout=1)
+        self.ser = Serial(port, baud, timeout=5)
 
-
-def send_str(command: bytes, verbose=False):
-    """
-    Commands:
-    C: clear all lights to black
-    A: apply all lights as set
-    R: set a specific LED to a RGB colour
-    H: set a specific LED to a HSV colour
-    """
-    global s
-
-    if verbose:
-        print(f"Sending {command}")
-
-    s.write(command)
-
-    # Read back echo
-    if verbose:
         try:
-            print("Reading...")
-            print(s.readline())
-        except s.SerialTimeoutException:
+            if b'ready' in self.ser.readline():
+                print("Success")
+            return True
+        except self.ser.SerialTimeoutException:
             print("Data could not be read")
 
+    def disconnect(self):
+        if self.ser:
+            self.ser.close()
 
-def send(command: Tuple, verbose=False):
-    """
-    Convert a command-tuple to a command-string
-    eg: (R, 255, 0, 128) -> b"R\xFF\x00\x80"
-    """
-    try:
-        send_str(b'<' + bytes((ord(command[0]),) + command[1:]) + b'>', verbose=verbose)
-    except TypeError:  # for command letter only with no parameters
-        send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
+    def send_str(self, command: bytes, verbose=False):
+        """
+        Commands:
+        C: clear all lights to black
+        A: apply all lights as set
+        R: set a specific LED to a RGB colour
+        H: set a specific LED to a HSV colour
+        """
+        if verbose:
+            print(f"Sending {command}")
 
+        self.ser.write(command)
 
-def send_solid_range(colour, leds, col_type='HSV', verbose=False):
-    for idx in leds:
-        send((col_type[0], idx, *colour), verbose=verbose)
-    send(('A'), verbose=verbose)
+        # Read back echo, will use timeout
+        if verbose:
+            try:
+                print("Reading...")
+                print(self.ser.readline())
+            except self.ser.SerialTimeoutException:
+                print("Data could not be read")
+
+    def send(self, command: Tuple, verbose=False):
+        """
+        Convert a command-tuple to a command-string
+        eg: (R, 255, 0, 128) -> b"R\xFF\x00\x80"
+        """
+        try:
+            self.send_str(
+                b'<' + bytes((ord(command[0]),) + command[1:]) + b'>', verbose=verbose
+            )
+        except TypeError:  # for command letter only with no parameters
+            self.send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
+
+    def send_solid_range(self, colour, leds, col_type='HSV', verbose=False):
+        for idx in leds:
+            self.send((col_type[0], idx, *colour), verbose=verbose)
+        self.send(('A'), verbose=verbose)
 
 
 def main():
-    connect(PORT, BAUD)
+    arduino = Arduino()
+    arduino.connect(PORT, 19200)
 
     while True:
-        send_str(b'<A\x07\x23\x73>')
+        arduino.send_str(b'<A\x07\x23\x73>')
         time.sleep(1)
-        send(('R', 50, 255, 0, 128))
+        arduino.send(('R', 50, 255, 0, 128))
         time.sleep(1)
-        send(('C'))
+        arduino.send(('C'))
         time.sleep(1)
 
         for i in range(40, 60):
-            send(('C'))
-            send(('H', i, 255, 0, 128))
-            send(('A'))
+            arduino.send(('C'))
+            arduino.send(('H', i, 255, 0, 128))
+            arduino.send(('A'))
             time.sleep(1)
 
 
