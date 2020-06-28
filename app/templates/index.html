@@ -1,0 +1,46 @@
+<html>
+<head>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <title>Sunlight Colour Selector</title>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro"></script>
+
+    <script>
+        var socket = io();
+        var colorWheel = new iro.ColorPicker("#colorWheelDemo", {
+            // options here
+        });
+
+
+        function callback_colour(color, changes)  {
+            console.log(colorWheel.color.hsv);
+            socket.emit('json', {data: colorWheel.color.hsv});
+        }
+
+        function throttle (callback, limit) {
+            var wait = false;                  // Initially, we're not waiting
+            return function () {               // We return a throttled function
+                if (!wait) {                   // If we're not waiting
+                    callback.call();           // Execute users function
+                    wait = true;               // Prevent future invocations
+                    setTimeout(function () {   // After a period of time
+                        wait = false;          // And allow future invocations
+                    }, limit);
+                }
+            }
+        }
+
+        colorWheel.on('color:change', throttle(callback_colour, 30));
+    </script>
+
+    </head>
+    <body>
+
+    <h1>Sunlight Colour Selector</h1>
+
+    <div class="wheel" id="colorWheelDemo"></div>
+
+    </body>
+</html>
