@@ -4,19 +4,38 @@
 
     <title>Sunlight Colour Selector</title>
 
+    <style>
+        body {
+            font-family: "Arial"
+        }
+
+        h1 {
+            font-family: "Georgia";
+            text-align: center;
+        }
+
+        .wheel {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+    </style>
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro"></script>
 
     <script>
         var socket = io();
         var colorWheel = new iro.ColorPicker("#colorWheelDemo", {
-            // options here
+            // width of the color picker
+            width: 600,
         });
 
 
-        function callback_colour(color, changes)  {
+        function callback_colour()  {
             console.log(colorWheel.color.hsv);
             socket.emit('json', {data: colorWheel.color.hsv});
+            document.body.style.background = colorWheel.color.hexString;
         }
 
         function throttle (callback, limit) {
