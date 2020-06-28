@@ -14,7 +14,7 @@ def loop():
 
 
 def main():
-    ard.connect()
+    ard.connect(baud=19200)
 
     print("Running...")
 
