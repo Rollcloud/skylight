@@ -19,6 +19,26 @@
             margin: 0 auto;
         }
 
+        .buttons {
+            width: 600px;
+            margin: 1em auto;
+            text-align: center;
+        }
+
+        .chosen {
+            position: absolute;
+            top: 0;
+            right: 10%;
+        }
+
+        .chosen td.swatch {
+            width: 20px;
+            border: solid 1px black;
+        }
+        .chosen td:nth-of-type(2) {
+          font-family: "Source Code Pro", monospace;
+        }
+
     </style>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
@@ -33,7 +53,7 @@
 
 
         function callback_colour()  {
-            console.log(colorWheel.color.hsv);
+            // console.log(colorWheel.color.hsv);
             socket.emit('json', {data: colorWheel.color.hsv});
             document.body.style.background = colorWheel.color.hexString;
         }
@@ -52,6 +72,65 @@
         }
 
         colorWheel.on('color:change', throttle(callback_colour, 30));
+
+        document.addEventListener('click', function (event) {
+            // If the clicked element doesn't have the right selector, bail
+            if (!event.target.matches('#swatch-add')) return;
+
+            // Don't follow the link
+            event.preventDefault();
+
+            // Setup the HTML string with initial content
+            var html = document.querySelector('#swatch-rows').innerHTML;
+
+            var hexString = colorWheel.color.hexString;
+            var hsv = JSON.stringify(colorWheel.color.hsv);
+
+            html += '<tr>' +
+                    '<td class="swatch" style="background: ' + hexString + '"> &nbsp; </td>' +
+                    '<td>' + hexString + '</td>' +
+                    '<td><button class="swatch-set" data-hsv=\''+hsv+'\' data-hexstring=\''+hexString+'\'>Set</button></td>' +
+                    '</tr>';
+
+            // set DOM
+            document.querySelector('#swatch-rows').innerHTML = html;
+
+        }, false);
+
+        document.addEventListener('click', function (event) {
+            // If the clicked element doesn't have the right selector, bail
+            if (!event.target.matches('.swatch-set')) return;
+
+            // Don't follow the link
+            event.preventDefault();
+
+            var hexString = event.srcElement.dataset.hexstring;
+            var hsv = JSON.parse(event.srcElement.dataset.hsv);
+
+            // console.log({data: hsv});
+
+            socket.emit('json', {data: hsv});
+            document.body.style.background = hexString;
+
+        }, false);
+
+        document.addEventListener('click', function (event) {
+            // If the clicked element doesn't have the right selector, bail
+            if (!event.target.matches('#flash')) return;
+
+            // Don't follow the link
+            event.preventDefault();
+
+
+            console.log({data: hsv});
+
+            socket.emit('json', {data: hsv});
+            // socket.emit('json', {data: {'h': 0, 's': 0, 'v': 255}});
+            socket.emit('json', {data: hsv});
+            // document.body.style.background = hexString;
+
+        }, false);
+
     </script>
 
     </head>
@@ -60,6 +139,25 @@
     <h1>Sunlight Colour Selector</h1>
 
     <div class="wheel" id="colorWheelDemo"></div>
+    <div class="buttons">
+        <button id="swatch-add">Add Colour</button>
+        <button id="flash">Flash</button>
+    </div>
+
+    <div class="chosen">
+
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Hex</th>
+                    <th>Load</th>
+                </tr>
+            </thead>
+            <tbody id="swatch-rows"></tbody>
+        </table>
+
+    </div>
 
     </body>
 </html>
