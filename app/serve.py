@@ -1,7 +1,5 @@
 #! .venv/bin/python3
 
-import time
-
 # Start with a basic flask app webpage.
 from flask_socketio import SocketIO
 from flask import Flask, render_template
@@ -95,4 +93,3 @@ def handle_effect(json):
 
 if __name__ == '__main__':
     socketio.run(app)
-    pass
