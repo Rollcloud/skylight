@@ -121,14 +121,7 @@
             // Don't follow the link
             event.preventDefault();
 
-
-            console.log({data: hsv});
-
-            socket.emit('json', {data: hsv});
-            // socket.emit('json', {data: {'h': 0, 's': 0, 'v': 255}});
-            socket.emit('json', {data: hsv});
-            // document.body.style.background = hexString;
-
+            socket.emit('effect', {effect: 'lightning'});
         }, false);
 
     </script>

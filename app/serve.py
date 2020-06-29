@@ -7,6 +7,7 @@ from flask_socketio import SocketIO
 from flask import Flask, render_template
 
 # import LED packages
+import effects
 from interface import Arduino
 
 # constants
@@ -80,6 +81,16 @@ def handle_json(json):
     )
     # print(colour_out)
     get_arduino().send_solid_range(colour_out, LEDS, col_type='HSV')
+
+
+@socketio.on('effect')
+def handle_effect(json):
+    # print('received json: ' + str(json))
+
+    effect = json['effect']
+
+    if effect == 'lightning':
+        effects.lightning_flash(get_arduino(), leds=LEDS)
 
 
 if __name__ == '__main__':
