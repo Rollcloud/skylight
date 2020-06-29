@@ -60,13 +60,13 @@ def lightning_flash(arduino, leds=range(60)):
     # }
 
     flash_sequence = [  # RGB
-        (256, 256, 256),  # white
+        (255, 255, 255),  # white
         (0, 0, 0),  # off
         (100, 100, 150),  # slight blue
         (0, 0, 0),  # off
         (50, 50, 50),  # off
         (0, 0, 0),  # off
-        (256, 256, 256),  # white
+        (255, 255, 255),  # white
         (0, 0, 0),  # off
         (0, 0, 0),  # off
         (0, 0, 0),  # off
@@ -75,14 +75,14 @@ def lightning_flash(arduino, leds=range(60)):
         (0, 0, 0),  # off
         (100, 100, 150),  # slight blue
         (0, 0, 0),  # off
-        (256, 256, 256),  # white
+        (255, 255, 255),  # white
         (0, 0, 0),  # off
         (0, 0, 0),  # off
         (0, 0, 0),  # off
         (255, 120, 255),  # purple
         (0, 0, 0),  # off
         (0, 0, 0),  # off
-        (256, 256, 256),  # white
+        (255, 255, 255),  # white
         (50, 50, 50),  # off
         (0, 0, 0),  # off
     ]
@@ -90,12 +90,12 @@ def lightning_flash(arduino, leds=range(60)):
     for i, each in enumerate(flash_sequence):
         arduino.send_solid_range(each, leds, col_type='RGB')
 
-        time(randrange(0.03, 0.25))
+        time.sleep(randrange(30, 250) / 1000)
         if i == 12:
-            time(randrange(0.25, 1))
+            time.sleep(randrange(250, 1000) / 1000)
 
     # add delay of 1 sec - 5 sec before repeating
-    # time(random(1, 5))
+    # time.sleep(randrange(1, 5))
 
 
 def main():
