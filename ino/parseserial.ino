@@ -37,6 +37,15 @@ void setLedHSV(byte command[]) {
   leds[command[1]] = CHSV(hue, sat, val);
 }
 
+void setLedRGB(byte command[]) {
+  int idx = command[1];
+  byte red = command[2];
+  byte grn = command[3];
+  byte blu = command[4];
+
+  leds[command[1]] = CRGB(red, grn, blu);
+}
+
 void recvBytesWithStartEndMarkers() {
   static boolean recvInProgress = false;
   static byte ndx = 0;
@@ -87,6 +96,9 @@ void showNewData() {
       break;
     case 'H':
       setLedHSV(receivedBytes);
+      break;
+    case 'R':
+      setLedRGB(receivedBytes);
       break;
     default:
       // if nothing else matches, do the default (optional)
