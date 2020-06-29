@@ -71,15 +71,23 @@
             }
         }
 
+        function addListener(element, type, callback) {
+            document.addEventListener(type, function (event) {
+                // If the clicked element doesn't have the right selector, bail
+                if (!event.target.matches(element)) return;
+
+                // Don't follow the link
+                event.preventDefault();
+
+               // call the callback
+               callback(event);
+
+            }, false);
+        }
+
         colorWheel.on('color:change', throttle(callback_colour, 30));
 
-        document.addEventListener('click', function (event) {
-            // If the clicked element doesn't have the right selector, bail
-            if (!event.target.matches('#swatch-add')) return;
-
-            // Don't follow the link
-            event.preventDefault();
-
+        addListener('#swatch-add', 'click', function (event) {
             // Setup the HTML string with initial content
             var html = document.querySelector('#swatch-rows').innerHTML;
 
@@ -94,16 +102,9 @@
 
             // set DOM
             document.querySelector('#swatch-rows').innerHTML = html;
+        });
 
-        }, false);
-
-        document.addEventListener('click', function (event) {
-            // If the clicked element doesn't have the right selector, bail
-            if (!event.target.matches('.swatch-set')) return;
-
-            // Don't follow the link
-            event.preventDefault();
-
+        addListener('.swatch-set', 'click', function (event) {
             var hexString = event.srcElement.dataset.hexstring;
             var hsv = JSON.parse(event.srcElement.dataset.hsv);
 
@@ -111,18 +112,11 @@
 
             socket.emit('json', {data: hsv});
             document.body.style.background = hexString;
+        });
 
-        }, false);
-
-        document.addEventListener('click', function (event) {
-            // If the clicked element doesn't have the right selector, bail
-            if (!event.target.matches('#flash')) return;
-
-            // Don't follow the link
-            event.preventDefault();
-
+        addListener('#flash', 'click', function (event) {
             socket.emit('effect', {effect: 'lightning'});
-        }, false);
+        });
 
     </script>
 
