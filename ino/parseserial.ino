@@ -18,6 +18,7 @@ boolean newData = false;
 void setup() {
   delay(3000); // power-up safety delay
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS).setCorrection(TypicalSMD5050);
+  FastLED.setTemperature(DirectSunlight);
 
   Serial.begin(BAUD);
   Serial.println("<Arduino is ready>");
