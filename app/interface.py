@@ -61,7 +61,7 @@ class Arduino:
         except TypeError:  # for command letter only with no parameters
             self.send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
 
-    def send_solid_range(self, colour: Colour, leds, verbose=False):
+    def send_solid_range(self, colour: Colour, leds: List[int], verbose=False):
         for idx in leds:
             self.send(('R', idx, *colour.rgb), verbose=verbose)
         self.send(('A'), verbose=verbose)
