@@ -6,6 +6,8 @@ from flask import Flask, render_template
 
 # import LED packages
 import effects
+
+from colours import Colour
 from interface import Arduino
 
 # constants
@@ -65,20 +67,10 @@ def test_disconnect():
 def handle_json(json):
     # print('received json: ' + str(json))
 
-    def scale(old_value, old_min, old_max, new_min, new_max):
-        return int(
-            ((old_value - old_min) / (old_max - old_min)) * (new_max - new_min)
-            + new_min
-        )
+    colour = Colour(json['data'])
+    # print(colour.rgb)
 
-    colour_in = json['data']
-    colour_out = (
-        scale(colour_in['h'], 0, 360, 0, 255),
-        scale(colour_in['s'], 0, 100, 0, 255),
-        scale(colour_in['v'], 0, 100, 0, 255),
-    )
-    # print(colour_out)
-    get_arduino().send_solid_range(colour_out, LEDS, col_type='HSV')
+    get_arduino().send_solid_range(colour, LEDS)
 
 
 @socketio.on('effect')

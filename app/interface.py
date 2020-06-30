@@ -4,6 +4,8 @@ from typing import Tuple
 
 from serial import Serial
 
+from colours import Colour
+
 PORT = 'COM3'
 BAUD = 9600
 
@@ -59,9 +61,9 @@ class Arduino:
         except TypeError:  # for command letter only with no parameters
             self.send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
 
-    def send_solid_range(self, colour, leds, col_type='HSV', verbose=False):
+    def send_solid_range(self, colour: Colour, leds, verbose=False):
         for idx in leds:
-            self.send((col_type[0], idx, *colour), verbose=verbose)
+            self.send(('R', idx, *colour.rgb), verbose=verbose)
         self.send(('A'), verbose=verbose)
 
 

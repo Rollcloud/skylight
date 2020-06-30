@@ -54,7 +54,7 @@
 
         function callback_colour()  {
             // console.log(colorWheel.color.hsv);
-            socket.emit('json', {data: colorWheel.color.hsv});
+            socket.emit('json', {data: colorWheel.color.hexString});
             document.body.style.background = colorWheel.color.hexString;
         }
 
@@ -92,12 +92,11 @@
             var html = document.querySelector('#swatch-rows').innerHTML;
 
             var hexString = colorWheel.color.hexString;
-            var hsv = JSON.stringify(colorWheel.color.hsv);
 
             html += '<tr>' +
                     '<td class="swatch" style="background: ' + hexString + '"> &nbsp; </td>' +
                     '<td>' + hexString + '</td>' +
-                    '<td><button class="swatch-set" data-hsv=\''+hsv+'\' data-hexstring=\''+hexString+'\'>Set</button></td>' +
+                    '<td><button class="swatch-set" data-hexstring=\''+hexString+'\'>Set</button></td>' +
                     '</tr>';
 
             // set DOM
@@ -106,11 +105,10 @@
 
         addListener('.swatch-set', 'click', function (event) {
             var hexString = event.srcElement.dataset.hexstring;
-            var hsv = JSON.parse(event.srcElement.dataset.hsv);
 
-            // console.log({data: hsv});
+            // console.log({data: hexString});
 
-            socket.emit('json', {data: hsv});
+            socket.emit('json', {data: hexString});
             document.body.style.background = hexString;
         });
 

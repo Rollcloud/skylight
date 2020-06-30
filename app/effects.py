@@ -2,6 +2,8 @@ import time
 
 from random import randrange
 
+from colours import Colour
+
 FPS = 30
 
 
@@ -60,35 +62,35 @@ def lightning_flash(arduino, leds=range(60)):
     # }
 
     flash_sequence = [  # RGB
-        (255, 255, 255),  # white
-        (0, 0, 0),  # off
-        (100, 100, 150),  # slight blue
-        (0, 0, 0),  # off
-        (50, 50, 50),  # off
-        (0, 0, 0),  # off
-        (255, 255, 255),  # white
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (255, 120, 255),  # purple
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (100, 100, 150),  # slight blue
-        (0, 0, 0),  # off
-        (255, 255, 255),  # white
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (255, 120, 255),  # purple
-        (0, 0, 0),  # off
-        (0, 0, 0),  # off
-        (255, 255, 255),  # white
-        (50, 50, 50),  # off
-        (0, 0, 0),  # off
+        Colour(255, 255, 255),  # white
+        Colour(0, 0, 0),  # off
+        Colour(100, 100, 150),  # slight blue
+        Colour(0, 0, 0),  # off
+        Colour(50, 50, 50),  # off
+        Colour(0, 0, 0),  # off
+        Colour(255, 255, 255),  # white
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(255, 120, 255),  # purple
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(100, 100, 150),  # slight blue
+        Colour(0, 0, 0),  # off
+        Colour(255, 255, 255),  # white
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(255, 120, 255),  # purple
+        Colour(0, 0, 0),  # off
+        Colour(0, 0, 0),  # off
+        Colour(255, 255, 255),  # white
+        Colour(50, 50, 50),  # off
+        Colour(0, 0, 0),  # off
     ]
 
     for i, each in enumerate(flash_sequence):
-        arduino.send_solid_range(each, leds, col_type='RGB')
+        arduino.send_solid_range(each, leds)
 
         time.sleep(randrange(30, 250) / 1000)
         if i == 12:
