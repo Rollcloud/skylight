@@ -1,8 +1,4 @@
-import sys
-
-sys.path.append(".")
-
-from app.colours import Colour, brighten  # noqa
+from app.colours import Colour, brighten
 
 
 def test_create_colours():
