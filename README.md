@@ -13,3 +13,6 @@ Mimic the lighting over the course of a day using Python, an Arduino, and a LED 
 4. `$ pipenv sync`
 5. `$ pipenv run app/serve.py`
 6. Browse to `htp://localhost:5000` to control LEDs
+
+# Test
+`$ pipenv run pytest ./tests`
