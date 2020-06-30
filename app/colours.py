@@ -1,8 +1,11 @@
 import colorsys
 
 
-def scale(value, factor):
-    return tuple(v * factor for v in value)
+def brighten(colour, factor):
+    h, s, v = colorsys.rgb_to_hsv(*colour.colour)
+    colour.colour = colorsys.hsv_to_rgb(h, s, min(max(v * factor, 0), 1))
+
+    return colour
 
 
 class Colour:
