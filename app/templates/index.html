@@ -51,13 +51,6 @@
             width: 450,
         });
 
-
-        function callback_colour()  {
-            // console.log(colorWheel.color.hsv);
-            socket.emit('json', {data: colorWheel.color.hexString});
-            document.body.style.background = colorWheel.color.hexString;
-        }
-
         function throttle (callback, limit) {
             var wait = false;                  // Initially, we're not waiting
             return function () {               // We return a throttled function
@@ -85,9 +78,14 @@
             }, false);
         }
 
-        colorWheel.on('color:change', throttle(callback_colour, 30));
 
-        addListener('#swatch-add', 'click', function (event) {
+        function applyColour()  {
+            // console.log(colorWheel.color.hsv);
+            socket.emit('json', {data: colorWheel.color.hexString});
+            document.body.style.background = colorWheel.color.hexString;
+        }
+
+        function saveColour () {
             // Setup the HTML string with initial content
             var html = document.querySelector('#swatch-rows').innerHTML;
 
@@ -101,16 +99,23 @@
 
             // set DOM
             document.querySelector('#swatch-rows').innerHTML = html;
-        });
+        }
 
-        addListener('.swatch-set', 'click', function (event) {
+        function loadColour(event) {
             var hexString = event.srcElement.dataset.hexstring;
-
-            // console.log({data: hexString});
 
             socket.emit('json', {data: hexString});
             document.body.style.background = hexString;
-        });
+        }
+
+
+        colorWheel.on('color:change', throttle(applyColour, 30));
+
+        addListener('circle', 'dblclick', saveColour);
+
+        addListener('#swatch-add', 'click', saveColour);
+
+        addListener('.swatch-set', 'click', loadColour);
 
         addListener('#flash', 'click', function (event) {
             socket.emit('effect', {effect: 'lightning'});
