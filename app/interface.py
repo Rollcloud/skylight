@@ -1,6 +1,6 @@
 import time
 
-from typing import Tuple
+from typing import List, Tuple
 
 from serial import Serial
 
@@ -64,6 +64,13 @@ class Arduino:
     def send_solid_range(self, colour: Colour, leds, verbose=False):
         for idx in leds:
             self.send(('R', idx, *colour.rgb), verbose=verbose)
+        self.send(('A'), verbose=verbose)
+
+    def set_leds_to_colours(
+        self, colours: List[Colour], leds: List[int], verbose=False
+    ):
+        for idx, c in zip(leds, colours):
+            self.send(('R', idx, *c.rgb), verbose=verbose)
         self.send(('A'), verbose=verbose)
 
 
