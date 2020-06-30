@@ -65,22 +65,29 @@ def test_disconnect():
 
 @socketio.on('json')
 def handle_json(json):
+    global g
     # print('received json: ' + str(json))
 
     colour = Colour(json['data'])
     # print(colour.rgb)
 
+    g['sky_colour'] = colour
     get_arduino().send_solid_range(colour, LEDS)
 
 
 @socketio.on('effect')
 def handle_effect(json):
+    global g
+
     # print('received json: ' + str(json))
 
     effect = json['effect']
 
     if effect == 'lightning':
-        effects.lightning_flash(get_arduino(), leds=LEDS)
+        if 'sky_colour' not in g:
+            g['sky_colour'] = Colour(0, 0, 0)
+
+        effects.lightning_flash(get_arduino(), g['sky_colour'], leds=LEDS)
 
 
 if __name__ == '__main__':

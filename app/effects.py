@@ -7,7 +7,7 @@ from colours import Colour
 FPS = 30
 
 
-def lightning_flash(arduino, leds=range(60)):
+def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
     print("## Flash ##")
 
     # Excerpt of original Arduino program from Storm_Cloud below:
@@ -63,30 +63,30 @@ def lightning_flash(arduino, leds=range(60)):
 
     flash_sequence = [  # RGB
         Colour(255, 255, 255),  # white
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
         Colour(100, 100, 150),  # slight blue
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
         Colour(50, 50, 50),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
         Colour(255, 255, 255),  # white
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
+        sky_colour,  # off
+        sky_colour,  # off
         Colour(255, 120, 255),  # purple
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
+        sky_colour,  # off
         Colour(100, 100, 150),  # slight blue
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
         Colour(255, 255, 255),  # white
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
+        sky_colour,  # off
+        sky_colour,  # off
         Colour(255, 120, 255),  # purple
-        Colour(0, 0, 0),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
+        sky_colour,  # off
         Colour(255, 255, 255),  # white
         Colour(50, 50, 50),  # off
-        Colour(0, 0, 0),  # off
+        sky_colour,  # off
     ]
 
     for i, each in enumerate(flash_sequence):
