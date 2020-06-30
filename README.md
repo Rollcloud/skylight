@@ -1,4 +1,4 @@
-# sunlight
+# skylight
 Mimic the lighting over the course of a day using Python, an Arduino, and a LED strip
 
 # Requirements
