@@ -11,6 +11,7 @@
 
         h1 {
             font-family: "Georgia";
+            font-style: italic;
             text-align: center;
         }
 
@@ -18,19 +19,29 @@
             width: 450px;
             margin: 0 auto;
         }
+        .wheel svg.IroWheel {
+            background: #ddd;
+            border-radius: 99rem;
+            padding: 5px;
+            margin-top: -5px;
+            margin-left: -5px;
+        }
 
         .buttons {
             width: 450px;
-            margin: 1em auto;
+            margin: 1rem auto;
             text-align: center;
         }
 
         .chosen {
             position: absolute;
-            top: 0;
-            right: 10%;
+            top: 3rem;
+            right: 1rem;
         }
 
+        .chosen th:nth-of-type(2) {
+          width: 4.5rem;
+        }
         .chosen td.swatch {
             width: 20px;
             border: solid 1px black;
