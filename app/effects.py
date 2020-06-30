@@ -4,12 +4,8 @@ from random import randrange
 
 from colours import Colour
 
-FPS = 30
-
 
 def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
-    print("## Flash ##")
-
     # Excerpt of original Arduino program from Storm_Cloud below:
 
     # const int lightPin = 3;

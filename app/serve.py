@@ -79,14 +79,10 @@ def handle_json(json):
 def handle_effect(json):
     global g
 
-    # print('received json: ' + str(json))
+    if 'sky_colour' not in g:
+        g['sky_colour'] = Colour(0, 0, 0)
 
-    effect = json['effect']
-
-    if effect == 'lightning':
-        if 'sky_colour' not in g:
-            g['sky_colour'] = Colour(0, 0, 0)
-
+    if json['effect'] == 'lightning':
         effects.lightning_flash(get_arduino(), g['sky_colour'], leds=LEDS)
 
 
