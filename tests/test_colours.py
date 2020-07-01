@@ -38,3 +38,10 @@ def test_colours_brighten():
     assert brighten(Colour(63, 127, 256), 0.1).hsv == (155, 192, 25)
     assert brighten(Colour(63, 127, 256), 0.5).hsv == (155, 192, 127)
     assert brighten(Colour(63, 127, 256), 1.0).hsv == (155, 192, 255)
+
+
+def test_colours_brighten_copy():
+    # check that original colour is not modified
+    colour_a = Colour("#ffffff")
+    colour_b = brighten(colour_a, 0.5)
+    assert colour_a != colour_b

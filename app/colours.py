@@ -3,9 +3,8 @@ import colorsys
 
 def brighten(colour, factor):
     h, s, v = colorsys.rgb_to_hsv(*colour.colour)
-    colour.colour = colorsys.hsv_to_rgb(h, s, min(max(v * factor, 0), 1))
 
-    return colour
+    return Colour(colour=colorsys.hsv_to_rgb(h, s, min(max(v * factor, 0), 1)))
 
 
 class Colour:
@@ -13,8 +12,9 @@ class Colour:
     A class to describe RGB based colours in different formats
     """
 
-    def __init__(self, *args):
-        self.colour = (0, 0, 0)  # native format
+    def __init__(self, *args, colour=(0, 0, 0)):
+        # use the colour keyword to pass in the raw RGB values between 0.0 and 1.0
+        self.colour = colour
 
         if len(args) == 1:
             description = args[0]
