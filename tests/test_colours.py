@@ -51,3 +51,11 @@ def test_colours_brighten_copy():
     colour_a = Colour("#ffffff")
     colour_b = brighten(colour_a, 0.5)
     assert colour_a != colour_b
+
+
+def test_colours_equivalence():
+    assert Colour(255, 255, 255) == Colour(255, 255, 255)
+    assert Colour(123, 124, 125) == Colour(123, 124, 125)
+    assert Colour(255, 255, 255) == Colour("#ffffff")
+    assert Colour(0, 0, 0) == Colour("#000000")
+    assert Colour(0, 0, 0) != Colour(255, 255, 255)
