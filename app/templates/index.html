@@ -132,6 +132,10 @@
             socket.emit('effect', {effect: 'lightning'});
         });
 
+        addListener('#cloud', 'click', function (event) {
+            socket.emit('effect', {effect: 'cloud_drift'});
+        });
+
     </script>
 
     </head>
@@ -143,6 +147,7 @@
     <div class="buttons">
         <button id="swatch-add">Add Colour</button>
         <button id="flash">Flash</button>
+        <button id="cloud">Cloud</button>
     </div>
 
     <div class="chosen">

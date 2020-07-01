@@ -1,7 +1,119 @@
 import random
 import time
 
-from colours import Colour
+from math import ceil
+
+from colours import Colour, brighten
+
+FPS = 20
+
+
+def transpose(l):
+    return [list(i) for i in zip(*l)]
+
+
+class Cloud:
+    def __init__(self, position, width=25, edge=5, opacity=0.3):
+        '''
+        position: initial position of cloud
+        width: of cloud shadow in LEDs
+        edge: num LEDs per side in penumbra of cloud shadow
+        opacity: strength of cloud shadow (0, 1)
+
+        model - an animated block moving to the right
+          _____________
+         /            /  ->
+        /____________/
+        E             E
+        |<-  width  ->|
+             position |
+        '''
+        self.position = position
+
+        self.width = width
+        self.edge = edge
+        self.opacity = opacity
+
+    def opacity_at(self, x):
+        # model
+        # 0.3    _______
+        # y     /       \
+        # 0 ___/    x    \|
+
+        edge = self.edge
+        width = self.width
+        opacity = self.opacity
+
+        x -= self.position
+
+        if x > -width + edge and x < -edge:
+            # in middle
+            return opacity
+        elif x >= -width and x <= -width + edge:
+            # left limb
+            # y= opacity / edge * x + opacity / edge * width
+            return opacity / edge * x + opacity / edge * width
+        elif x >= -edge and x <= 0:
+            # right limb
+            # y= - opacity / edge * x
+            return -opacity / edge * x
+        else:
+            # clear sky
+            return 0
+
+    def calc_colours(self, leds, sky_colour):
+        return [brighten(sky_colour, 1 - self.opacity_at(i)) for i in leds]
+
+
+def cloud_drift(
+    arduino, sky_colour=Colour(0, 0, 0), leds=range(60), velocity=5,
+):
+    '''
+    velocity: velocity of cloud shadow in LEDs / second
+    '''
+    CLOUD_WIDTH = 25
+
+    start_position = leds[0] if velocity > 0 else leds[-1] + CLOUD_WIDTH
+
+    cloud = Cloud(start_position, CLOUD_WIDTH, opacity=0.75)
+
+    seconds = abs((len(leds) + CLOUD_WIDTH) / velocity)
+    frames = int(ceil(FPS * seconds))
+
+    print(seconds, frames)
+
+    # attempt to improve frame rate...
+    colours_prev = None
+
+    def frame_diff(colours, leds):
+        nonlocal colours_prev
+
+        if colours_prev is None:
+            colours_prev = colours
+
+            return colours, leds
+
+        diff = []
+        for p, c, l in zip(colours_prev, colours, leds):
+            if p != c:
+                diff.append((c, l))
+
+        colours_prev = colours
+
+        return transpose(diff)
+
+    for each in range(frames):
+        cloud.position += velocity / FPS
+
+        colours = cloud.calc_colours(leds, sky_colour)
+        led_diff = frame_diff(colours, leds)
+        if len(led_diff) > 0:  # if differences have been found
+            arduino.set_leds_to_colours(*led_diff)
+
+        time.sleep(1.0 / FPS)
+
+    # restore sky to original colour
+    arduino.send_solid_range(sky_colour, leds)
 
 
 def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):

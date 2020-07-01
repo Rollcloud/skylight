@@ -85,6 +85,9 @@ def handle_effect(json):
     if json['effect'] == 'lightning':
         effects.lightning_flash(get_arduino(), g['sky_colour'], leds=LEDS)
 
+    if json['effect'] == 'cloud_drift':
+        effects.cloud_drift(get_arduino(), g['sky_colour'], leds=LEDS)
+
 
 if __name__ == '__main__':
     socketio.run(app)
