@@ -7,6 +7,12 @@ def test_create_colours():
     assert Colour(255, 255, 255).colour == (1.0, 1.0, 1.0)
 
 
+def test_colours_repr():
+    assert repr(Colour(0, 0, 0)) == 'Colour(0, 0, 0)'
+    assert repr(Colour(63, 127, 256)) == 'Colour(63, 127, 255)'
+    assert repr(Colour(255, 255, 255)) == 'Colour(255, 255, 255)'
+
+
 def test_colours_hex():
     assert Colour(0, 0, 0).hex == "#000000"
     assert Colour(63, 127, 256).hex == "#3f7fff"

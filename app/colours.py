@@ -47,3 +47,6 @@ class Colour:
             raise NotImplementedError("Cannot process colour names")
         else:
             raise AttributeError
+
+    def __repr__(self):
+        return f"Colour{self.rgb}"
