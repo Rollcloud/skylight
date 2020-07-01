@@ -28,7 +28,7 @@ class Arduino:
         if self.ser:
             self.ser.close()
 
-    def send_str(self, command: bytes, verbose=False):
+    def send_str(self, command: bytes, verbose=False, read_nack=False):
         """
         Commands:
         C: clear all lights to black
@@ -41,8 +41,9 @@ class Arduino:
 
         self.ser.write(command)
 
-        # Read back echo, will use timeout
-        if verbose:
+        # Read back negative acknowledge, will use timeout
+        # Data only provide if command not recognised
+        if read_nack:
             try:
                 print("Reading...")
                 print(self.ser.readline())
