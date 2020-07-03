@@ -92,7 +92,7 @@
 
         function applyColour()  {
             // console.log(colorWheel.color.hsv);
-            socket.emit('json', {data: colorWheel.color.hexString});
+            socket.emit('set', {data: colorWheel.color.hexString});
             document.body.style.background = colorWheel.color.hexString;
         }
 
@@ -105,7 +105,7 @@
             html += '<tr>' +
                     '<td class="swatch" style="background: ' + hexString + '"> &nbsp; </td>' +
                     '<td>' + hexString + '</td>' +
-                    '<td><button class="swatch-set" data-hexstring=\''+hexString+'\'>Set</button></td>' +
+                    '<td><button class="swatch-load" data-hexstring=\''+hexString+'\'>Set</button></td>' +
                     '</tr>';
 
             // set DOM
@@ -115,7 +115,7 @@
         function loadColour(event) {
             var hexString = event.srcElement.dataset.hexstring;
 
-            socket.emit('json', {data: hexString});
+            socket.emit('fade', {data: hexString});
             document.body.style.background = hexString;
         }
 
@@ -126,7 +126,7 @@
 
         addListener('#swatch-add', 'click', saveColour);
 
-        addListener('.swatch-set', 'click', loadColour);
+        addListener('.swatch-load', 'click', loadColour);
 
         addListener('#flash', 'click', function (event) {
             socket.emit('effect', {effect: 'lightning'});

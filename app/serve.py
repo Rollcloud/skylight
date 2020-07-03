@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
-g = {}
+g = {'sky_colour': Colour(128, 128, 128)}
 
 # turn the flask app into a socketio app
 socketio = SocketIO(app, async_mode=None, logger=True, engineio_logger=True)
@@ -63,24 +63,31 @@ def test_disconnect():
     close_arduino()
 
 
-@socketio.on('json')
-def handle_json(json):
+@socketio.on('set')
+def handle_set(json):
     global g
-    # print('received json: ' + str(json))
 
     colour = Colour(json['data'])
     # print(colour.rgb)
 
-    g['sky_colour'] = colour
     get_arduino().send_solid_range(colour, LEDS)
+    g['sky_colour'] = colour
+
+
+@socketio.on('fade')
+def handle_fade(json):
+    global g
+
+    colour_new = Colour(json['data'])
+    # print(colour.rgb)
+
+    get_arduino().fade_from_to(g['sky_colour'], colour_new, leds=LEDS, time=5.00)
+    g['sky_colour'] = colour_new
 
 
 @socketio.on('effect')
 def handle_effect(json):
     global g
-
-    if 'sky_colour' not in g:
-        g['sky_colour'] = Colour(0, 0, 0)
 
     if json['effect'] == 'lightning':
         effects.lightning_flash(get_arduino(), g['sky_colour'], leds=LEDS)
