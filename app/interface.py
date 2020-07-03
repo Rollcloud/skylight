@@ -1,3 +1,4 @@
+from math import ceil
 from time import sleep
 from time import time as now
 from typing import List, Tuple
@@ -10,6 +11,10 @@ PORT = 'COM3'
 BAUD = 9600
 
 LEDS = range(60)
+
+
+def linspace(start, stop, num=10):
+    return [start + x * (stop - start) / (num - 1) for x in range(num)]
 
 
 class Arduino:
@@ -90,6 +95,22 @@ class Arduino:
         for idx, c in zip(leds, colours):
             self.send(('R', idx, *c.rgb), verbose=verbose)
         self.apply_leds(verbose=verbose)
+
+    def fade_from_to(
+        self, colour_old, colour_new, leds: List[int] = LEDS, time=1.00, fps=10
+    ):
+        frames = int(ceil(fps * time))
+        h_old, s_old, v_old = colour_old.hsv
+        h_new, s_new, v_new = colour_new.hsv
+
+        for h, s, v in zip(
+            linspace(h_old, h_new, frames),
+            linspace(s_old, s_new, frames),
+            linspace(v_old, v_new, frames),
+        ):
+            print(Colour().from_hsv(h, s, v).hsv)
+            self.send_solid_range(Colour().from_hsv(h, s, v), leds)
+            # sleep(1.0 / fps)
 
 
 def main():
