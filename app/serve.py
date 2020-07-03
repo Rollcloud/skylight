@@ -29,7 +29,7 @@ def get_arduino():
     if 'arduino' not in g:
         print(" *** Connecting to Arduino ***")
         g['arduino'] = Arduino()
-        g['arduino'].connect(baud=19200)
+        g['arduino'].connect(baud=19200, acknowledge=True)
 
     # for each in g:
     #     print(each)
@@ -42,7 +42,7 @@ def close_arduino(e=None):
 
     if 'arduino' in g:
         print(" *** Disconnecting from Arduino ***")
-        g['arduino'].close()
+        g['arduino'].disconnect()
 
 
 @app.route('/')
@@ -60,7 +60,6 @@ def test_connect():
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
-    close_arduino()
 
 
 @socketio.on('set')
