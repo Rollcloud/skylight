@@ -55,3 +55,10 @@ class Colour:
 
     def __repr__(self):
         return f"Colour{self.rgb}"
+
+    def from_hsv(self, h, s, v):
+        self.colour = colorsys.hsv_to_rgb(
+            min(h / 255.0, 1.0), min(s / 255.0, 1.0), min(v / 255.0, 1.0)
+        )
+
+        return self

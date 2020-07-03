@@ -31,6 +31,12 @@ def test_colours_hsv():
     assert Colour(255, 255, 255).hsv == (0, 0, 255)
 
 
+def test_colours_from_hsv():
+    assert Colour().from_hsv(0, 0, 0).hsv == (0, 0, 0)
+    assert Colour().from_hsv(63, 127, 256).hsv == (63, 127, 255)
+    assert Colour().from_hsv(255, 255, 255).hsv == (0, 255, 255)
+
+
 def test_colours_brighten():
     assert brighten(Colour(255, 0, 0), 0.5).hsv == (0, 255, 127)
     assert brighten(Colour(0, 255, 0), 0.5).hsv == (85, 255, 127)
