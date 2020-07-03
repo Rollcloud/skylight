@@ -1,5 +1,4 @@
-import time
-
+from time import sleep
 from typing import List, Tuple
 
 from serial import Serial
@@ -9,9 +8,11 @@ from colours import Colour
 PORT = 'COM3'
 BAUD = 9600
 
+LEDS = range(60)
+
 
 class Arduino:
-    def connect(self, port=PORT, baud=BAUD, verbose=False):
+    def connect(self, port=PORT, baud=BAUD, acknowledge=False, verbose=False):
         if verbose:
             print(f"Connecting to '{PORT}' at {baud} baud...")
 
@@ -19,7 +20,8 @@ class Arduino:
 
         try:
             if b'ready' in self.ser.readline():
-                print("Success")
+                if acknowledge:
+                    self.clear_leds()
             return True
         except self.ser.SerialTimeoutException:
             print("Data could not be read")
@@ -62,17 +64,24 @@ class Arduino:
         except TypeError:  # for command letter only with no parameters
             self.send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
 
-    def send_solid_range(self, colour: Colour, leds: List[int], verbose=False):
-        for idx in leds:
-            self.send(('R', idx, *colour.rgb), verbose=verbose)
+    def apply_leds(self, verbose=False):
         self.send(('A'), verbose=verbose)
 
+    def clear_leds(self, verbose=False):
+        self.send(('C'), verbose=verbose)
+        self.apply_leds(verbose=verbose)
+
+    def send_solid_range(self, colour: Colour, leds: List[int] = LEDS, verbose=False):
+        for idx in leds:
+            self.send(('R', idx, *colour.rgb), verbose=verbose)
+        self.apply_leds(verbose=verbose)
+
     def set_leds_to_colours(
-        self, colours: List[Colour], leds: List[int], verbose=False
+        self, colours: List[Colour], leds: List[int] = LEDS, verbose=False
     ):
         for idx, c in zip(leds, colours):
             self.send(('R', idx, *c.rgb), verbose=verbose)
-        self.send(('A'), verbose=verbose)
+        self.apply_leds(verbose=verbose)
 
 
 def main():
@@ -81,17 +90,17 @@ def main():
 
     while True:
         arduino.send_str(b'<A\x07\x23\x73>')
-        time.sleep(1)
+        sleep(1)
         arduino.send(('R', 50, 255, 0, 128))
-        time.sleep(1)
+        sleep(1)
         arduino.send(('C'))
-        time.sleep(1)
+        sleep(1)
 
         for i in range(40, 60):
             arduino.send(('C'))
             arduino.send(('H', i, 255, 0, 128))
             arduino.send(('A'))
-            time.sleep(1)
+            sleep(1)
 
 
 if __name__ == "__main__":
