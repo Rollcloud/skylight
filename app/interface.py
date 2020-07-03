@@ -1,4 +1,5 @@
 from time import sleep
+from time import time as now
 from typing import List, Tuple
 
 from serial import Serial
@@ -12,6 +13,8 @@ LEDS = range(60)
 
 
 class Arduino:
+    block_until = 0
+
     def connect(self, port=PORT, baud=BAUD, acknowledge=False, verbose=False):
         if verbose:
             print(f"Connecting to '{PORT}' at {baud} baud...")
@@ -57,6 +60,10 @@ class Arduino:
         Convert a command-tuple to a command-string
         eg: (R, 255, 0, 128) -> b"R\xFF\x00\x80"
         """
+        # wait for strip to write previous command before sending next command
+        while now() < self.block_until:
+            sleep(0.015)  # 10 ms
+
         try:
             self.send_str(
                 b'<' + bytes((ord(command[0]),) + command[1:]) + b'>', verbose=verbose
@@ -66,6 +73,7 @@ class Arduino:
 
     def apply_leds(self, verbose=False):
         self.send(('A'), verbose=verbose)
+        self.block_until = now() + 0.100  # 100 ms
 
     def clear_leds(self, verbose=False):
         self.send(('C'), verbose=verbose)
