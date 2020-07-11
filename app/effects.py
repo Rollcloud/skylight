@@ -5,7 +5,7 @@ from math import ceil
 
 from colours import Colour, brighten
 
-FPS = 20
+FPS = 25
 
 
 class Cloud:
