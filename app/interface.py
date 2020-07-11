@@ -38,7 +38,7 @@ class Arduino:
         if self.ser:
             self.ser.close()
 
-    def send_str(self, command: bytes, verbose=False, read_nack=False):
+    def _send_str(self, command: bytes, verbose=False, read_nack=False):
         """
         Commands:
         C: clear all lights to black
@@ -60,7 +60,7 @@ class Arduino:
             except self.ser.SerialTimeoutException:
                 print("Data could not be read")
 
-    def send(self, command: Tuple, verbose=False):
+    def _send(self, command: Tuple, verbose=False):
         """
         Convert a command-tuple to a command-string
         eg: (R, 255, 0, 128) -> b"R\xFF\x00\x80"
@@ -70,18 +70,18 @@ class Arduino:
             sleep(0.015)  # 10 ms
 
         try:
-            self.send_str(
+            self._send_str(
                 b'<' + bytes((ord(command[0]),) + command[1:]) + b'>', verbose=verbose
             )
         except TypeError:  # for command letter only with no parameters
-            self.send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
+            self._send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
 
     def apply_leds(self, verbose=False):
-        self.send(('A'), verbose=verbose)
+        self._send(('A'), verbose=verbose)
         self.block_until = now() + 0.100  # 100 ms
 
     def clear_leds(self, verbose=False):
-        self.send(('C'), verbose=verbose)
+        self._send(('C'), verbose=verbose)
         self.apply_leds(verbose=verbose)
 
     def send_solid_range(self, colour: Colour, leds: List[int] = LEDS, verbose=False):
@@ -111,26 +111,3 @@ class Arduino:
             print(Colour().from_hsv(h, s, v).hsv)
             self.send_solid_range(Colour().from_hsv(h, s, v), leds)
             # sleep(1.0 / fps)
-
-
-def main():
-    arduino = Arduino()
-    arduino.connect(PORT, 19200)
-
-    while True:
-        arduino.send_str(b'<A\x07\x23\x73>')
-        sleep(1)
-        arduino.send(('R', 50, 255, 0, 128))
-        sleep(1)
-        arduino.send(('C'))
-        sleep(1)
-
-        for i in range(40, 60):
-            arduino.send(('C'))
-            arduino.send(('H', i, 255, 0, 128))
-            arduino.send(('A'))
-            sleep(1)
-
-
-if __name__ == "__main__":
-    main()
