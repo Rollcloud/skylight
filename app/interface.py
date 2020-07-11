@@ -11,6 +11,9 @@ from colours import Colour
 PORT = 'COM3'
 BAUD = 9600
 
+TIME_BETWEEN_CMDS = 0.010  # s
+TIME_BETWEEN_APPLIES = 0.030  # s
+
 LEDS = range(60)  # must start from 0
 
 
@@ -108,7 +111,7 @@ class Arduino:
         """
         # wait for strip to write previous command before sending next command
         while now() < self.block_until:
-            sleep(0.015)  # 10 ms
+            sleep(TIME_BETWEEN_CMDS)
 
         try:
             self._send_str(
@@ -119,7 +122,7 @@ class Arduino:
 
     def apply_leds(self, verbose=False):
         self._send(('A'), verbose=verbose)
-        self.block_until = now() + 0.100  # 100 ms
+        self.block_until = now() + TIME_BETWEEN_APPLIES
 
     def clear_leds(self, verbose=False):
         self._send(('C'), verbose=verbose)
