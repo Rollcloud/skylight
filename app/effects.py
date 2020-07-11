@@ -8,10 +8,6 @@ from colours import Colour, brighten
 FPS = 20
 
 
-def transpose(l):
-    return [list(i) for i in zip(*l)]
-
-
 class Cloud:
     def __init__(self, position, width=25, edge=5, opacity=0.3):
         '''
@@ -82,38 +78,16 @@ def cloud_drift(
 
     print(seconds, frames)
 
-    # attempt to improve frame rate...
-    colours_prev = None
-
-    def frame_diff(colours, leds):
-        nonlocal colours_prev
-
-        if colours_prev is None:
-            colours_prev = colours
-
-            return colours, leds
-
-        diff = []
-        for p, c, l in zip(colours_prev, colours, leds):
-            if p != c:
-                diff.append((c, l))
-
-        colours_prev = colours
-
-        return transpose(diff)
-
     for each in range(frames):
         cloud.position += velocity / FPS
 
         colours = cloud.calc_colours(leds, sky_colour)
-        led_diff = frame_diff(colours, leds)
-        if len(led_diff) > 0:  # if differences have been found
-            arduino.set_leds_to_colours(*led_diff)
+        arduino.set_leds_to_colours(colours, leds)
 
         time.sleep(1.0 / FPS)
 
     # restore sky to original colour
-    arduino.send_solid_range(sky_colour, leds)
+    arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
 
 
 def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
@@ -162,11 +136,11 @@ def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
     )
 
     for i, each in enumerate(random.choice(flash_sequences)):
-        arduino.send_solid_range(each, leds)
+        arduino.set_leds_to_colours([each] * len(leds), leds)
         time.sleep(random.randrange(5, 100) / 1000)
 
     # restore sky to original colour
-    arduino.send_solid_range(sky_colour, leds)
+    arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
 
 
 def main():

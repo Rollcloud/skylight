@@ -1,7 +1,8 @@
+from itertools import groupby
 from math import ceil
 from time import sleep
 from time import time as now
-from typing import List, Tuple
+from typing import Iterator, List, Tuple
 
 from serial import Serial
 
@@ -10,15 +11,55 @@ from colours import Colour
 PORT = 'COM3'
 BAUD = 9600
 
-LEDS = range(60)
+LEDS = range(60)  # must start from 0
 
 
 def linspace(start, stop, num=10):
     return [start + x * (stop - start) / (num - 1) for x in range(num)]
 
 
+def transpose(array):
+    return [list(each) for each in zip(*array)]
+
+
+def encode_differences(colours_prev, colours, leds):
+    if colours_prev is None:
+        colours_prev = colours
+
+        return colours, leds
+
+    diff = []
+    for p, c, l in zip(colours_prev, colours, leds):
+        if p != c:
+            diff.append((c, l))
+
+    colours_prev = colours
+
+    return transpose(diff)
+
+
+def encode_groups(colours, leds) -> Iterator[Tuple[Colour, List[int]]]:
+    '''returns a list of colour-led ranges using 'absolute' run length encoding'''
+
+    def key_func(i):
+        return i[0]
+
+    groups = (
+        (key, [l for c, l in group])
+        for key, group in groupby(list(zip(colours, leds)), key_func)
+    )
+
+    return groups
+
+
+def encode(colours_prev, colours, leds) -> Iterator[Tuple[Colour, List[int]]]:
+    '''encode by both differences and groups'''
+    return encode_groups(*encode_differences(colours_prev, colours, leds))
+
+
 class Arduino:
     block_until = 0
+    led_colours = [Colour() for each in LEDS]
 
     def connect(self, port=PORT, baud=BAUD, acknowledge=False, verbose=False):
         if verbose:
@@ -84,17 +125,28 @@ class Arduino:
         self._send(('C'), verbose=verbose)
         self.apply_leds(verbose=verbose)
 
-    def send_solid_range(self, colour: Colour, leds: List[int] = LEDS, verbose=False):
-        for idx in leds:
-            self.send(('R', idx, *colour.rgb), verbose=verbose)
-        self.apply_leds(verbose=verbose)
+    def set_colour_block(self, colour: Colour, leds: List[int] = LEDS, verbose=False):
+        '''
+        Sends commands directly over serial
+        '''
+        led_min = leds[0]
+        led_max = leds[-1]
+        self._send(('G', led_min, led_max, *colour.hsv), verbose=verbose)
 
     def set_leds_to_colours(
-        self, colours: List[Colour], leds: List[int] = LEDS, verbose=False
+        self, new_colours: List[Colour], leds: List[int] = LEDS, verbose=False
     ):
-        for idx, c in zip(leds, colours):
-            self.send(('R', idx, *c.rgb), verbose=verbose)
-        self.apply_leds(verbose=verbose)
+        '''
+        Encodes LED commands to reduce serial communications
+        '''
+        groups = encode(self.led_colours, new_colours, leds)
+        for c, l in groups:
+            self.set_colour_block(c, l, verbose=verbose)
+        self.apply_leds()
+
+        # remember colours for next command
+        for n, l in zip(new_colours, leds):
+            self.led_colours[l] = n
 
     def fade_from_to(
         self, colour_old, colour_new, leds: List[int] = LEDS, time=1.00, fps=10
@@ -109,5 +161,5 @@ class Arduino:
             linspace(v_old, v_new, frames),
         ):
             print(Colour().from_hsv(h, s, v).hsv)
-            self.send_solid_range(Colour().from_hsv(h, s, v), leds)
-            # sleep(1.0 / fps)
+            self.set_leds_to_colours([Colour().from_hsv(h, s, v)] * len(leds), leds)
+            sleep(1.0 / fps)

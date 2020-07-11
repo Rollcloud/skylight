@@ -69,7 +69,7 @@ def handle_set(json):
     colour = Colour(json['data'])
     # print(colour.rgb)
 
-    get_arduino().send_solid_range(colour, LEDS)
+    get_arduino().set_leds_to_colours([colour] * len(LEDS), LEDS)
     g['sky_colour'] = colour
 
 

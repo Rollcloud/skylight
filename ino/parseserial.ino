@@ -38,6 +38,18 @@ void setLedHSV(byte command[]) {
   leds[command[1]] = CHSV(hue, sat, val);
 }
 
+void setRangeHSV(byte command[]) {
+  int min = command[1];
+  int max = command[2];
+  byte hue = command[3];
+  byte sat = command[4];
+  byte val = command[5];
+
+  for (int i = min; i <= max; ++i) {
+    leds[i] = CHSV(hue, sat, val);
+  }
+}
+
 void setLedRGB(byte command[]) {
   int idx = command[1];
   byte red = command[2];
@@ -94,6 +106,9 @@ void showNewData() {
       break;
     case 'A':
       FastLED.show();
+      break;
+    case 'G':
+      setRangeHSV(receivedBytes);
       break;
     case 'H':
       setLedHSV(receivedBytes);
