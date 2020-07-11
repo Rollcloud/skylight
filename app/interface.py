@@ -145,7 +145,7 @@ class Arduino:
         groups = encode(self.led_colours, new_colours, leds)
         for c, l in groups:
             self.set_colour_block(c, l, verbose=verbose)
-        self.apply_leds()
+        self.apply_leds(verbose=verbose)
 
         # remember colours for next command
         for n, l in zip(new_colours, leds):
