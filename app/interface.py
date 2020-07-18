@@ -189,6 +189,6 @@ class Arduino:
             linspace(s_old, s_new, frames),
             linspace(v_old, v_new, frames),
         ):
-            print(Colour().from_hsv(h, s, v).hsv)
+            # print(Colour().from_hsv(h, s, v).hsv)
             self.set_leds_to_colours([Colour().from_hsv(h, s, v)] * len(leds), leds)
             sleep(1.0 / fps)
