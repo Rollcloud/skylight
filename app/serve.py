@@ -10,12 +10,19 @@ import effects
 from colours import Colour
 from interface import Arduino
 
-# constants
-LEDS = range(35, 60)
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-app.config['DEBUG'] = True
+app.config.from_object('config_default')
+app.config.from_object('config')
+
+if not app.config['SECRET_KEY']:
+    raise ValueError(
+        "Please set constant SECRET_KEY in 'app/config.py' for Flask application"
+    )
+
+effects.FPS = app.config['FPS']
+PORT = app.config['PORT']
+BAUD = app.config['BAUD']
+LEDS = app.config['LEDS']
 
 g = {'sky_colour': Colour(128, 128, 128)}
 
@@ -29,7 +36,7 @@ def get_arduino():
     if 'arduino' not in g:
         print(" *** Connecting to Arduino ***")
         g['arduino'] = Arduino()
-        g['arduino'].connect(baud=19200, acknowledge=True)
+        g['arduino'].connect(port=PORT, baud=BAUD, acknowledge=True)
 
     # for each in g:
     #     print(each)

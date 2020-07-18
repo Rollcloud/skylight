@@ -8,9 +8,6 @@ from serial import Serial
 
 from colours import Colour
 
-PORT = 'COM3'
-BAUD = 9600
-
 TIME_BETWEEN_CMDS = 0.010  # s
 TIME_BETWEEN_APPLIES = 0.030  # s
 
@@ -64,7 +61,7 @@ class Arduino:
     block_until = 0
     led_colours = [Colour() for each in LEDS]
 
-    def connect(self, port=PORT, baud=BAUD, acknowledge=False, verbose=False):
+    def connect(self, port=None, baud=9600, acknowledge=False, verbose=False):
         if verbose:
             print(f"Connecting to '{PORT}' at {baud} baud...")
 
