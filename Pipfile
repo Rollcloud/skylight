@@ -11,6 +11,7 @@ eventlet = "*"
 flask = "*"
 flask-socketio = "*"
 pyserial = "*"
+colored = "*"
 
 [requires]
 python_version = "3.8"

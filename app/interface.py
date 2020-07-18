@@ -5,6 +5,7 @@ from time import time as now
 from typing import Iterator, List, Tuple
 
 from serial import Serial
+from colored import bg, stylize
 
 from colours import Colour
 
@@ -60,24 +61,41 @@ def encode(colours_prev, colours, leds) -> Iterator[Tuple[Colour, List[int]]]:
 class Arduino:
     block_until = 0
     led_colours = [Colour() for each in LEDS]
+    simulate = False
 
     def connect(self, port=None, baud=9600, acknowledge=False, verbose=False):
         if verbose:
             print(f"Connecting to '{PORT}' at {baud} baud...")
 
-        self.ser = Serial(port, baud, timeout=5)
+        if port is None:
+            self.simulate = True
 
-        try:
-            if b'ready' in self.ser.readline():
-                if acknowledge:
-                    self.clear_leds()
-            return True
-        except self.ser.SerialTimeoutException:
-            print("Data could not be read")
+        if self.simulate:
+            print("Connected to Arduino (simulated)")
+        else:
+            self.ser = Serial(port, baud, timeout=5)
+
+            try:
+                if b'ready' in self.ser.readline():
+                    if acknowledge:
+                        self.clear_leds()
+                return True
+            except self.ser.SerialTimeoutException:
+                print("Data could not be read")
 
     def disconnect(self):
-        if self.ser:
-            self.ser.close()
+        if self.simulate:
+            print("Closing connection")
+        else:
+            if self.ser:
+                self.ser.close()
+
+    def print_leds(self):
+        output = ''
+        for colour in self.led_colours:
+            output += stylize(" ", bg(colour.hex))
+
+        print(output)
 
     def _send_str(self, command: bytes, verbose=False, read_nack=False):
         """
@@ -118,20 +136,30 @@ class Arduino:
             self._send_str(b'<' + bytes([ord(command[0])]) + b'>', verbose=verbose)
 
     def apply_leds(self, verbose=False):
-        self._send(('A'), verbose=verbose)
-        self.block_until = now() + TIME_BETWEEN_APPLIES
+        if self.simulate:
+            self.print_leds()
+        else:
+            self._send(('A'), verbose=verbose)
+            self.block_until = now() + TIME_BETWEEN_APPLIES
 
     def clear_leds(self, verbose=False):
-        self._send(('C'), verbose=verbose)
-        self.apply_leds(verbose=verbose)
+        if self.simulate:
+            self.print_leds()
+        else:
+            self._send(('C'), verbose=verbose)
+            self.apply_leds(verbose=verbose)
+        self.led_colours = [Colour() for each in LEDS]
 
     def set_colour_block(self, colour: Colour, leds: List[int] = LEDS, verbose=False):
         '''
         Sends commands directly over serial
         '''
-        led_min = leds[0]
-        led_max = leds[-1]
-        self._send(('G', led_min, led_max, *colour.hsv), verbose=verbose)
+        if self.simulate:
+            pass
+        else:
+            led_min = leds[0]
+            led_max = leds[-1]
+            self._send(('G', led_min, led_max, *colour.hsv), verbose=verbose)
 
     def set_leds_to_colours(
         self, new_colours: List[Colour], leds: List[int] = LEDS, verbose=False
@@ -142,11 +170,12 @@ class Arduino:
         groups = encode(self.led_colours, new_colours, leds)
         for c, l in groups:
             self.set_colour_block(c, l, verbose=verbose)
-        self.apply_leds(verbose=verbose)
 
         # remember colours for next command
         for n, l in zip(new_colours, leds):
             self.led_colours[l] = n
+
+        self.apply_leds(verbose=verbose)
 
     def fade_from_to(
         self, colour_old, colour_new, leds: List[int] = LEDS, time=1.00, fps=10

@@ -129,3 +129,28 @@ class TestArduino_send_str:
     def test_send_hsv(self, patched_send_str):
         self.arduino._send(('H', 23, 255, 0, 128))
         patched_send_str.assert_called_with(ANY, b'<H\x17\xff\x00\x80>', verbose=ANY)
+
+
+class TestArduinoSimulation:
+    # check results against calls to Serial
+    # any calls will result in an assertion fail
+    def setup(self):
+        self.arduino = itf.Arduino()
+        self.arduino.connect(port=None)
+
+    def test_apply_leds(self):
+        self.arduino.apply_leds()
+        assert hasattr(self.arduino, 'ser') is False
+
+    def test_clear_leds(self):
+        self.arduino.clear_leds()
+        assert hasattr(self.arduino, 'ser') is False
+
+    def test_set_colour_block(self):
+        self.arduino.set_colour_block(Colour("#12456"), range(10))
+        assert hasattr(self.arduino, 'ser') is False
+
+    def test_set_leds_to_colours(self):
+        new_colours = [Colour() for each in range(10)]
+        self.arduino.set_leds_to_colours(new_colours, range(10))
+        assert hasattr(self.arduino, 'ser') is False
