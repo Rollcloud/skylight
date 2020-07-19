@@ -177,6 +177,9 @@ class Arduino:
 
         self.apply_leds(verbose=verbose)
 
+    # move to effects
+    # change into torus-cylinder
+    # split at green
     def fade_from_to(
         self, colour_old, colour_new, leds: List[int] = LEDS, time=1.00, fps=10
     ):
