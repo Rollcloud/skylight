@@ -15,10 +15,6 @@ TIME_BETWEEN_APPLIES = 0.030  # s
 LEDS = range(60)  # must start from 0
 
 
-def linspace(start, stop, num=10):
-    return [start + x * (stop - start) / (num - 1) for x in range(num)]
-
-
 def transpose(array):
     return [list(each) for each in zip(*array)]
 
@@ -176,22 +172,3 @@ class Arduino:
             self.led_colours[l] = n
 
         self.apply_leds(verbose=verbose)
-
-    # move to effects
-    # change into torus-cylinder
-    # split at green
-    def fade_from_to(
-        self, colour_old, colour_new, leds: List[int] = LEDS, time=1.00, fps=10
-    ):
-        frames = int(ceil(fps * time))
-        h_old, s_old, v_old = colour_old.hsv
-        h_new, s_new, v_new = colour_new.hsv
-
-        for h, s, v in zip(
-            linspace(h_old, h_new, frames),
-            linspace(s_old, s_new, frames),
-            linspace(v_old, v_new, frames),
-        ):
-            # print(Colour().from_hsv(h, s, v).hsv)
-            self.set_leds_to_colours([Colour().from_hsv(h, s, v)] * len(leds), leds)
-            sleep(1.0 / fps)

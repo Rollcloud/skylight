@@ -87,7 +87,9 @@ def handle_fade(json):
     colour_new = Colour(json['data'])
     # print(colour.rgb)
 
-    get_arduino().fade_from_to(g['sky_colour'], colour_new, leds=LEDS, time=5.00)
+    effects.fade_from_to(
+        get_arduino(), g['sky_colour'], colour_new, leds=LEDS, duration=5.00
+    )
     g['sky_colour'] = colour_new
 
 

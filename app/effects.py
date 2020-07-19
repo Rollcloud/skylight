@@ -4,8 +4,13 @@ import time
 from math import ceil
 
 from colours import Colour, brighten
+from typing import List
 
 FPS = 25
+
+
+def linspace(start, stop, num=10):
+    return [start + x * (stop - start) / (num - 1) for x in range(num)]
 
 
 class Cloud:
@@ -84,7 +89,7 @@ def cloud_drift(
         colours = cloud.calc_colours(leds, sky_colour)
         arduino.set_leds_to_colours(colours, leds)
 
-        time.sleep(1.0 / FPS)
+        time.sleep(1.0 / FPS - 0.050)
 
     # restore sky to original colour
     arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
@@ -141,6 +146,34 @@ def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
 
     # restore sky to original colour
     arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
+
+
+# change into torus-cylinder
+def fade_from_to(
+    arduino, colour_old, colour_new, leds: List[int] = range(60), duration=1.00
+):
+    frames = int(ceil(FPS * duration))
+    h_old, s_old, v_old = colour_old.hsv
+    h_new, s_new, v_new = colour_new.hsv
+
+    # split continuous hues at green #00ff00 -> 120* -> 89
+    hue_split = 89
+
+    h_old -= hue_split - 255
+    h_new -= hue_split - 255
+    h_old %= 255
+    h_new %= 255
+
+    for h, s, v in zip(
+        linspace(h_old, h_new, frames),
+        linspace(s_old, s_new, frames),
+        linspace(v_old, v_new, frames),
+    ):
+        # print(Colour().from_hsv(h, s, v).hsv)
+        arduino.set_leds_to_colours(
+            [Colour().from_hsv((h + hue_split) % 255, s, v)] * len(leds), leds
+        )
+        time.sleep(1.0 / FPS)
 
 
 def main():
