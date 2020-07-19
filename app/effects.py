@@ -156,23 +156,13 @@ def fade_from_to(
     h_old, s_old, v_old = colour_old.hsv
     h_new, s_new, v_new = colour_new.hsv
 
-    # split continuous hues at green #00ff00 -> 120* -> 89
-    hue_split = 89
-
-    h_old -= hue_split - 255
-    h_new -= hue_split - 255
-    h_old %= 255
-    h_new %= 255
-
     for h, s, v in zip(
         linspace(h_old, h_new, frames),
         linspace(s_old, s_new, frames),
         linspace(v_old, v_new, frames),
     ):
         # print(Colour().from_hsv(h, s, v).hsv)
-        arduino.set_leds_to_colours(
-            [Colour().from_hsv((h + hue_split) % 255, s, v)] * len(leds), leds
-        )
+        arduino.set_leds_to_colours([Colour().from_hsv(h, s, v)] * len(leds), leds)
         time.sleep(1.0 / FPS)
 
 
