@@ -148,21 +148,54 @@ def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
     arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
 
 
-# change into torus-cylinder
+def rect(r, theta):
+    '''
+    theta in degrees
+    returns tuple; (float, float); (x,y)
+    '''
+    x = r * math.cos(math.radians(theta))
+    y = r * math.sin(math.radians(theta))
+    return x, y
+
+
+def polar(x, y):
+    '''
+    returns r, theta(degrees)
+    '''
+    r = (x ** 2 + y ** 2) ** 0.5
+    theta = math.degrees(math.atan2(y, x))
+    return r, theta
+
+
+def hcv_to_xyz(h, c, v):
+    r, theta = c, h / 255 * 360
+    return (*rect(), v)
+
+
+def xyz_to_hcv(x, y, z):
+    r, theta = polar(x, y)
+    theta = theta / 360 * 255
+    return (r, theta, v)
+
+
 def fade_from_to(
     arduino, colour_old, colour_new, leds: List[int] = range(60), duration=1.00
 ):
+    '''
+    create a gradient through a cone in cartesian space
+    '''
     frames = int(ceil(FPS * duration))
-    h_old, s_old, v_old = colour_old.hsv
-    h_new, s_new, v_new = colour_new.hsv
 
-    for h, s, v in zip(
-        linspace(h_old, h_new, frames),
-        linspace(s_old, s_new, frames),
-        linspace(v_old, v_new, frames),
+    x1, y1, z1 = hcv_to_xyz(*colour_old.hcv)
+    x2, y2, z2 = hcv_to_xyz(*colour_new.hcv)
+
+    for x, y, z in zip(
+        linspace(x1, x2, frames), linspace(y1, y2, frames), linspace(z1, z2, frames)
     ):
-        # print(Colour().from_hsv(h, s, v).hsv)
-        arduino.set_leds_to_colours([Colour().from_hsv(h, s, v)] * len(leds), leds)
+        # x, y, z -> hcv -> hsv
+        c = Colour().from_hcv(xyz_to_hcv(x, y, z))
+
+        arduino.set_leds_to_colours([c] * len(leds), leds)
         time.sleep(1.0 / FPS)
 
 

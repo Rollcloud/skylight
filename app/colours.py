@@ -43,6 +43,9 @@ class Colour:
             return tuple(int(v * 255) for v in self.colour)
         elif key == 'hsv':
             return tuple(int(v * 255) for v in colorsys.rgb_to_hsv(*self.colour))
+        elif key == 'hcv':  # hue, chroma, value: a cone in cartesian space
+            h, s, v = self.hsv
+            return (h, s * v / 255, v)
         elif key == 'name':
             raise NotImplementedError("Cannot process colour names")
         else:
@@ -60,5 +63,15 @@ class Colour:
         self.colour = colorsys.hsv_to_rgb(
             min(h / 255.0, 1.0), min(s / 255.0, 1.0), min(v / 255.0, 1.0)
         )
+
+        return self
+
+    def from_hcv(self, h, c, v):
+        try:
+            s = c * 256 / v
+            self.from_hsv(h, s, v)
+        except ZeroDivisionError:
+            # if v == 0, return black
+            self.colour = (0, 0, 0)
 
         return self
