@@ -89,7 +89,7 @@ def cloud_drift(
         colours = cloud.calc_colours(leds, sky_colour)
         arduino.set_leds_to_colours(colours, leds)
 
-        time.sleep(1.0 / FPS - 0.050)
+        time.sleep(max(0,1.0 / FPS - 0.050))
 
     # restore sky to original colour
     arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
