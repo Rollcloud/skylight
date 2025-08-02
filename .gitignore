@@ -1,3 +1,5 @@
 *.pdf
 .venv/
 app/config.py
+__pycache__/
+*.pyc
