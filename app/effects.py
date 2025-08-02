@@ -1,10 +1,9 @@
 import random
 import time
-
 from math import ceil
+from typing import List
 
 from colours import Colour, brighten
-from typing import List
 
 FPS = 25
 
@@ -15,7 +14,7 @@ def linspace(start, stop, num=10):
 
 class Cloud:
     def __init__(self, position, width=25, edge=5, opacity=0.3):
-        '''
+        """
         position: initial position of cloud
         width: of cloud shadow in LEDs
         edge: num LEDs per side in penumbra of cloud shadow
@@ -28,7 +27,7 @@ class Cloud:
         E             E
         |<-  width  ->|
              position |
-        '''
+        """
         self.position = position
 
         self.width = width
@@ -67,11 +66,14 @@ class Cloud:
 
 
 def cloud_drift(
-    arduino, sky_colour=Colour(0, 0, 0), leds=range(60), velocity=5,
+    arduino,
+    sky_colour=Colour(0, 0, 0),
+    leds=range(60),
+    velocity=5,
 ):
-    '''
+    """
     velocity: velocity of cloud shadow in LEDs / second
-    '''
+    """
     CLOUD_WIDTH = 25
 
     start_position = leds[0] if velocity > 0 else leds[-1] + CLOUD_WIDTH
@@ -89,7 +91,7 @@ def cloud_drift(
         colours = cloud.calc_colours(leds, sky_colour)
         arduino.set_leds_to_colours(colours, leds)
 
-        time.sleep(max(0,1.0 / FPS - 0.050))
+        time.sleep(max(0, 1.0 / FPS - 0.050))
 
     # restore sky to original colour
     arduino.set_leds_to_colours([sky_colour] * len(leds), leds)
@@ -149,20 +151,20 @@ def lightning_flash(arduino, sky_colour=Colour(0, 0, 0), leds=range(60)):
 
 
 def rect(r, theta):
-    '''
+    """
     theta in degrees
     returns tuple; (float, float); (x,y)
-    '''
+    """
     x = r * math.cos(math.radians(theta))
     y = r * math.sin(math.radians(theta))
     return x, y
 
 
 def polar(x, y):
-    '''
+    """
     returns r, theta(degrees)
-    '''
-    r = (x ** 2 + y ** 2) ** 0.5
+    """
+    r = (x**2 + y**2) ** 0.5
     theta = math.degrees(math.atan2(y, x))
     return r, theta
 
@@ -181,9 +183,9 @@ def xyz_to_hcv(x, y, z):
 def fade_from_to(
     arduino, colour_old, colour_new, leds: List[int] = range(60), duration=1.00
 ):
-    '''
+    """
     create a gradient through a cone in cartesian space
-    '''
+    """
     frames = int(ceil(FPS * duration))
 
     x1, y1, z1 = hcv_to_xyz(*colour_old.hcv)
@@ -209,10 +211,10 @@ def main():
         lightning_flash(arduino)
     except KeyboardInterrupt:
         print("Aborting...")
-        arduino.send(('C'))
-        arduino.send(('A'))
+        arduino.send(("C"))
+        arduino.send(("A"))
         arduino.disconnect()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
