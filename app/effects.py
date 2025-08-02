@@ -1,6 +1,6 @@
+import math
 import random
 import time
-from math import ceil
 from typing import List
 
 from colours import Colour, brighten
@@ -81,7 +81,7 @@ def cloud_drift(
     cloud = Cloud(start_position, CLOUD_WIDTH, opacity=0.75)
 
     seconds = abs((len(leds) + CLOUD_WIDTH) / velocity)
-    frames = int(ceil(FPS * seconds))
+    frames = int(math.ceil(FPS * seconds))
 
     print(seconds, frames)
 
@@ -171,12 +171,13 @@ def polar(x, y):
 
 def hcv_to_xyz(h, c, v):
     r, theta = c, h / 255 * 360
-    return (*rect(), v)
+    return (*rect(r, theta), v)
 
 
 def xyz_to_hcv(x, y, z):
     r, theta = polar(x, y)
     theta = theta / 360 * 255
+    v = z
     return (r, theta, v)
 
 
@@ -186,7 +187,7 @@ def fade_from_to(
     """
     create a gradient through a cone in cartesian space
     """
-    frames = int(ceil(FPS * duration))
+    frames = int(math.ceil(FPS * duration))
 
     x1, y1, z1 = hcv_to_xyz(*colour_old.hcv)
     x2, y2, z2 = hcv_to_xyz(*colour_new.hcv)
@@ -195,7 +196,7 @@ def fade_from_to(
         linspace(x1, x2, frames), linspace(y1, y2, frames), linspace(z1, z2, frames)
     ):
         # x, y, z -> hcv -> hsv
-        c = Colour().from_hcv(xyz_to_hcv(x, y, z))
+        c = Colour().from_hcv(*xyz_to_hcv(x, y, z))
 
         arduino.set_leds_to_colours([c] * len(leds), leds)
         time.sleep(1.0 / FPS)
